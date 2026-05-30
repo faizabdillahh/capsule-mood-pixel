@@ -6,7 +6,6 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 
-![Screenshot](screenshot.png)
 
 ## ✨ Fitur Utama
 
@@ -39,10 +38,9 @@ capsule-mood-pixel/
 ├── style.css             # Seluruh styling (Neobrutalism, responsive, motion)
 ├── script.js             # Logika kalender, penyimpanan, modal
 ├── README.md
-└── LICENSE.md
-└── CONTRIBUTING.md
+├── LICENSE.md
+├── CONTRIBUTING.md
 └── CODE_OF_CONDUCT.md
-
 ```
 
 ## 🚀 Cara Menjalankan
