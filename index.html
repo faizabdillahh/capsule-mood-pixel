@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capsule Mood Pixel — Kalender Suasana Hati</title>
+  <meta name="description" content="Rekam suasana hati harianmu dalam kalender piksel penuh warna. Navigasi bebas ke bulan dan tahun mana pun, tetapi hanya bisa mencatat untuk hari ini dan sebelumnya.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app" aria-label="Kalender Suasana Hati Bulanan">
+    <header class="header">
+      <div class="nav-bar">
+        <button class="nav-btn" id="btnPrev" aria-label="Bulan sebelumnya">&lsaquo;</button>
+        <h1 class="title" id="monthTitle" aria-live="polite"></h1>
+        <button class="nav-btn" id="btnNext" aria-label="Bulan berikutnya">&rsaquo;</button>
+      </div>
+      <button class="btn-today" id="btnToday">Hari ini</button>
+      <p class="subtitle">Klik tanggal untuk mencatat suasana hati (hari ini & sebelumnya)</p>
+    </header>
+
+    <div class="calendar-card">
+      <div class="day-names" aria-hidden="true">
+        <span>SEN</span><span>SEL</span><span>RAB</span><span>KAM</span>
+        <span>JUM</span><span>SAB</span><span>MIN</span>
+      </div>
+      <div class="grid" id="calendarGrid" role="grid" aria-label="Kalender"></div>
+    </div>
+
+    <!-- Legenda -->
+    <div class="legend" id="legend" aria-label="Kode warna suasana hati"></div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" hidden>
+      <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Pilih suasana hati">
+        <div class="modal-header">
+          <h2 class="modal-title">Suasana hati hari ini</h2>
+          <button class="modal-close" id="modalClose" aria-label="Tutup">&times;</button>
+        </div>
+        <div class="mood-options" id="moodOptions"></div>
+        <div class="modal-footer">
+          <button class="btn-clear" id="btnClearMood">Hapus pilihan</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
