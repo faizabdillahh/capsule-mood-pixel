@@ -1,8 +1,10 @@
 /**
  * Capsule Mood Pixel — Kalender Suasana Hati
  * Navigasi bulan/tahun bebas, localStorage.
- * Hanya bisa mengisi suasana hati untuk hari ini & sebelumnya.
- * Tanggal masa depan terkunci.
+ * Aturan edit:
+ * - Hari ini & sebelumnya di bulan berjalan.
+ * - Bulan lampau hanya bisa diedit hingga 2 hari setelah bulan berakhir.
+ * - Tanggal masa depan selalu terkunci.
  */
 const MOODS = [
   { key: 'happy',   label: 'Senang',  color: '#FDC800', icon: 'sun' },
@@ -83,6 +85,7 @@ const modalClose = document.getElementById('modalClose');
 const btnPrev = document.getElementById('btnPrev');
 const btnNext = document.getElementById('btnNext');
 const btnToday = document.getElementById('btnToday');
+const subtitle = document.querySelector('.subtitle');
 
 let currentYear, currentMonth;
 let activeDate = null; // string YYYY-MM-DD
@@ -192,12 +195,40 @@ function updateCell(dateStr, moodKey) {
   }
 }
 
+// ──────────────── Helper: Apakah bulan bisa diedit? ────────────────
+function isMonthEditable(year, month) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Jika bulan ini adalah bulan berjalan, selalu bisa (future check di level cell)
+  if (year === today.getFullYear() && month === today.getMonth()) {
+    return true;
+  }
+  
+  // Untuk bulan lampau: batas edit = hari terakhir bulan + 2 hari
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const cutoffDate = new Date(lastDayOfMonth);
+  cutoffDate.setDate(cutoffDate.getDate() + 2);
+  cutoffDate.setHours(23, 59, 59, 999);
+  
+  return today <= cutoffDate;
+}
+
 // ──────────────── Build Calendar ────────────────
 function buildCalendar(year, month) {
   currentYear = year;
   currentMonth = month;
   const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   monthTitle.textContent = `${bulan[month]} ${year}`;
+
+  const monthEditable = isMonthEditable(year, month);
+  
+  // Perbarui teks keterangan
+  if (!monthEditable) {
+    subtitle.textContent = 'Bulan ini sudah terkunci (hanya bisa diedit hingga 2 hari setelah bulan berakhir)';
+  } else {
+    subtitle.textContent = 'Klik tanggal untuk mencatat suasana hati (hari ini & sebelumnya)';
+  }
 
   const firstDay = new Date(year, month, 1);
   const isoWeekday = (firstDay.getDay() + 6) % 7; // Senin=0
@@ -206,8 +237,6 @@ function buildCalendar(year, month) {
 
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-
-  // Untuk menentukan apakah sel adalah masa depan
   const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   grid.innerHTML = '';
@@ -217,8 +246,6 @@ function buildCalendar(year, month) {
     const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const inMonth = d.getMonth() === month;
     const isToday = dateStr === todayStr;
-
-    // Cek masa depan
     const cellDateOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const isFuture = cellDateOnly > todayDateOnly;
 
@@ -230,10 +257,22 @@ function buildCalendar(year, month) {
     btn.setAttribute('role', 'gridcell');
     btn.setAttribute('aria-label', `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`);
 
-    // Disable jika luar bulan atau masa depan
-    const isDisabled = !inMonth || isFuture;
-    if (isDisabled) {
-      btn.classList.add(isFuture ? 'is-future' : 'is-disabled');
+    // Tentukan apakah tombol ini interaktif
+    let cellDisabled = false;
+    if (!inMonth) {
+      cellDisabled = true;
+      btn.classList.add('is-disabled');
+    } else if (!monthEditable) {
+      // Bulan terkunci → semua tanggal di bulan ini tidak bisa diedit
+      cellDisabled = true;
+      btn.classList.add('is-disabled');
+    } else if (isFuture) {
+      // Bulan berjalan → tanggal masa depan tidak bisa diedit
+      cellDisabled = true;
+      btn.classList.add('is-future');
+    }
+    
+    if (cellDisabled) {
       btn.tabIndex = -1;
       btn.setAttribute('aria-disabled', 'true');
     } else {
@@ -253,7 +292,7 @@ function buildCalendar(year, month) {
     }
 
     btn.addEventListener('click', () => {
-      if (isDisabled) return;
+      if (cellDisabled) return;
       openModal(dateStr);
     });
 
